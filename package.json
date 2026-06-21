@@ -1,0 +1,33 @@
+{
+  "name": "llm-observability-quality-lab",
+  "version": "1.0.0",
+  "description": "A Quality Engineering portfolio project focused on LLM observability, prompt regression testing, evaluation quality gates, and release governance using Langfuse and TypeScript.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "quality:check": "npm run typecheck && npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/annapiekarska/llm-observability-quality-lab.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/annapiekarska/llm-observability-quality-lab/issues"
+  },
+  "homepage": "https://github.com/annapiekarska/llm-observability-quality-lab#readme",
+  "devDependencies": {
+    "@types/node": "^26.0.0",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
+  }
+}
