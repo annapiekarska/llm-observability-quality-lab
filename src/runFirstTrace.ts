@@ -11,7 +11,17 @@ async function firstTrace() {
       promptName: "customer-support-policy",
       promptVersion: 1,
     };
-    const response = runCustomerSupportAssistant(request);
+    const response = await startActiveObservation(
+      "run-customer-support-assistant",
+      async (assistantSpan) => {
+        const assistantResponse = runCustomerSupportAssistant(request);
+        assistantSpan.update({
+          input: request,
+          output: assistantResponse,
+        });
+        return assistantResponse;
+      },
+    );
     span.update({
       input: request,
       output: response,
