@@ -14,11 +14,25 @@ async function firstTrace() {
     const response = await startActiveObservation(
       "run-customer-support-assistant",
       async (assistantSpan) => {
-        const assistantResponse = runCustomerSupportAssistant(request);
+        const assistantResponse = await startActiveObservation(
+          "generate-customer-support-answer",
+          async (generation) => {
+            const generatedResponse = runCustomerSupportAssistant(request);
+
+            generation.update({
+              input: request,
+              output: generatedResponse,
+              model: "mock-model",
+            });
+            return generatedResponse;
+          },
+          { asType: "generation" },
+        );
         assistantSpan.update({
           input: request,
           output: assistantResponse,
         });
+
         return assistantResponse;
       },
     );
