@@ -9,6 +9,7 @@ describe("runCustomerSupportAssistant", () => {
         "Products can be returned within 14 days only if they are unused and unopened.",
       promptName: "customer-support-policy",
       promptVersion: 1,
+      traceId: "test-trace-id",
     };
 
     const response = runCustomerSupportAssistant(request);
@@ -26,7 +27,7 @@ describe("runCustomerSupportAssistant", () => {
     expect(response.execution.environment).toBe("development");
     expect(response.execution.latencyMs).toBe(0);
 
-    expect(response.execution.traceId).not.toBe("");
+    expect(response.execution.traceId).toBe(request.traceId);
     expect(response.execution.modelOutput).toBe(response.answer);
     expect(response.execution.timestamp).not.toBe("");
   });

@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto";
 import type { LLMExecution } from "../types/llmObservability.js";
 
 export type CustomerSupportRequest = {
@@ -6,6 +5,7 @@ export type CustomerSupportRequest = {
   sourceContext: string;
   promptName: string;
   promptVersion: number;
+  traceId: string;
 };
 export type CustomerSupportResponse = {
   answer: string;
@@ -18,7 +18,7 @@ export const runCustomerSupportAssistant = (
   const answer = request.sourceContext;
 
   const execution: LLMExecution = {
-    traceId: randomUUID(),
+    traceId: request.traceId,
     userInput: request.userInput,
     sourceContext: request.sourceContext,
     promptName: request.promptName,
