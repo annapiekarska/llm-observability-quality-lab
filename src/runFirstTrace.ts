@@ -28,6 +28,12 @@ async function firstTrace() {
               input: request,
               output: generatedResponse,
               model: "mock-model",
+              metadata: {
+                promptName: request.promptName,
+                promptVersion: request.promptVersion,
+                promptLabel: "baseline",
+                scenario: "return-policy",
+              },
             });
             return generatedResponse;
           },
@@ -44,6 +50,14 @@ async function firstTrace() {
     span.update({
       input: request,
       output: response,
+      metadata: {
+        environment: "development",
+        promptName: request.promptName,
+        promptVersion: request.promptVersion,
+        promptLabel: "baseline",
+        modelName: "mock-model",
+        scenario: "return-policy",
+      },
     });
   });
   await sdk.shutdown();
