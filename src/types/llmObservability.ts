@@ -16,3 +16,9 @@ export type LLMExecution = {
   timestamp: string;
   errorMessage?: string;
 };
+export type ExecutionConfig = {
+  environment: Environment;
+  promptLabel: PromptLabel;
+  modelName: string;
+  scenario: string;
+};

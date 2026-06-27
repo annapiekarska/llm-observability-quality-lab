@@ -1,8 +1,15 @@
 import { sdk } from "./observability/instrumentation.js";
 import { startActiveObservation, getActiveTraceId } from "@langfuse/tracing";
 import { runCustomerSupportAssistant } from "./application/customerSupportAssistant.js";
+import type { ExecutionConfig } from "./types/llmObservability.js";
 
 async function firstTrace() {
+  const executionConfig: ExecutionConfig = {
+    environment: "development",
+    promptLabel: "baseline",
+    modelName: "mock-model",
+    scenario: "return-policy",
+  };
   await startActiveObservation("customer-support-request", async (span) => {
     const traceId = getActiveTraceId();
     if (!traceId) {
@@ -27,12 +34,12 @@ async function firstTrace() {
             generation.update({
               input: request,
               output: generatedResponse,
-              model: "mock-model",
+              model: executionConfig.modelName,
               metadata: {
                 promptName: request.promptName,
                 promptVersion: request.promptVersion,
-                promptLabel: "baseline",
-                scenario: "return-policy",
+                promptLabel: executionConfig.promptLabel,
+                scenario: executionConfig.scenario,
               },
             });
             return generatedResponse;
@@ -51,12 +58,12 @@ async function firstTrace() {
       input: request,
       output: response,
       metadata: {
-        environment: "development",
+        environment: executionConfig.environment,
         promptName: request.promptName,
         promptVersion: request.promptVersion,
-        promptLabel: "baseline",
-        modelName: "mock-model",
-        scenario: "return-policy",
+        promptLabel: executionConfig.promptLabel,
+        modelName: executionConfig.modelName,
+        scenario: executionConfig.scenario,
       },
     });
   });
