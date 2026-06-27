@@ -20,5 +20,4 @@ export type ExecutionConfig = {
   environment: Environment;
   promptLabel: PromptLabel;
   modelName: string;
-  scenario: string;
 };

@@ -1,28 +1,32 @@
-import { sdk } from "./observability/instrumentation.js";
-import { startActiveObservation, getActiveTraceId } from "@langfuse/tracing";
+import { getActiveTraceId, startActiveObservation } from "@langfuse/tracing";
+import { customerSupportScenarios } from "../test-data/customerSupportScenarios.js";
 import { runCustomerSupportAssistant } from "./application/customerSupportAssistant.js";
+import { sdk } from "./observability/instrumentation.js";
 import type { ExecutionConfig } from "./types/llmObservability.js";
+import type { CustomerSupportScenario } from "../test-data/customerSupportScenarios.js";
 
-async function firstTrace() {
-  const executionConfig: ExecutionConfig = {
-    environment: "development",
-    promptLabel: "baseline",
-    modelName: "mock-model",
-    scenario: "return-policy",
-  };
+const executionConfig: ExecutionConfig = {
+  environment: "development",
+  promptLabel: "baseline",
+  modelName: "mock-model",
+};
+
+async function runScenario(scenario: CustomerSupportScenario): Promise<void> {
   await startActiveObservation("customer-support-request", async (span) => {
     const traceId = getActiveTraceId();
+
     if (!traceId) {
-      throw new Error("active traceId was not found");
+      throw new Error("Active trace ID was not found");
     }
+
     const request = {
-      userInput: "Can I return an opened product?",
-      sourceContext:
-        "Products can be returned within 14 days only if they are unused and unopened.",
-      promptName: "customer-support-policy",
-      promptVersion: 1,
+      userInput: scenario.userInput,
+      sourceContext: scenario.sourceContext,
+      promptName: scenario.promptName,
+      promptVersion: scenario.promptVersion,
       traceId,
     };
+
     const response = await startActiveObservation(
       "run-customer-support-assistant",
       async (assistantSpan) => {
@@ -36,37 +40,56 @@ async function firstTrace() {
               output: generatedResponse,
               model: executionConfig.modelName,
               metadata: {
+                scenarioId: scenario.id,
+                scenario: scenario.scenario,
                 promptName: request.promptName,
                 promptVersion: request.promptVersion,
                 promptLabel: executionConfig.promptLabel,
-                scenario: executionConfig.scenario,
               },
             });
+
             return generatedResponse;
           },
           { asType: "generation" },
         );
+
         assistantSpan.update({
           input: request,
           output: assistantResponse,
+          metadata: {
+            scenarioId: scenario.id,
+            scenario: scenario.scenario,
+          },
         });
 
         return assistantResponse;
       },
     );
+
     span.update({
       input: request,
       output: response,
       metadata: {
+        scenarioId: scenario.id,
+        scenario: scenario.scenario,
         environment: executionConfig.environment,
         promptName: request.promptName,
         promptVersion: request.promptVersion,
         promptLabel: executionConfig.promptLabel,
         modelName: executionConfig.modelName,
-        scenario: executionConfig.scenario,
       },
     });
   });
-  await sdk.shutdown();
 }
-firstTrace();
+
+async function runDataset(): Promise<void> {
+  try {
+    for (const scenario of customerSupportScenarios) {
+      await runScenario(scenario);
+    }
+  } finally {
+    await sdk.shutdown();
+  }
+}
+
+await runDataset();
