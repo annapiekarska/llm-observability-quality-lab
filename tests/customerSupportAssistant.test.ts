@@ -10,6 +10,8 @@ describe("runCustomerSupportAssistant", () => {
       promptName: "customer-support-policy",
       promptVersion: 1,
       traceId: "test-trace-id",
+      compiledPrompt:
+        "You are a customer support assistant. Answer using only the source context.",
     };
 
     const response = runCustomerSupportAssistant(request);
@@ -20,6 +22,7 @@ describe("runCustomerSupportAssistant", () => {
     expect(response.execution.sourceContext).toBe(request.sourceContext);
     expect(response.execution.promptName).toBe(request.promptName);
     expect(response.execution.promptVersion).toBe(request.promptVersion);
+    expect(response.execution.prompt).toBe(request.compiledPrompt);
 
     expect(response.execution.promptLabel).toBe("baseline");
     expect(response.execution.modelName).toBe("mock-model");

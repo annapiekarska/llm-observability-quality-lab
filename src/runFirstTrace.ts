@@ -20,18 +20,27 @@ async function runScenario(scenario: CustomerSupportScenario): Promise<void> {
       throw new Error("Active trace ID was not found");
     }
 
+    /* const request = {
+      userInput: scenario.userInput,
+      sourceContext: scenario.sourceContext,
+      promptName: scenario.promptName,
+      promptVersion: scenario.promptVersion,
+      traceId,
+      compiledPrompt,
+    };*/
+    const compiledPrompt = await getCustomerSupportPrompt({
+      sourceContext: scenario.sourceContext,
+      userInput: scenario.userInput,
+      promptLabel: executionConfig.promptLabel,
+    });
     const request = {
       userInput: scenario.userInput,
       sourceContext: scenario.sourceContext,
       promptName: scenario.promptName,
       promptVersion: scenario.promptVersion,
       traceId,
+      compiledPrompt,
     };
-    const compiledPrompt = await getCustomerSupportPrompt({
-      sourceContext: scenario.sourceContext,
-      userInput: scenario.userInput,
-      promptLabel: executionConfig.promptLabel,
-    });
     const response = await startActiveObservation(
       "run-customer-support-assistant",
       async (assistantSpan) => {

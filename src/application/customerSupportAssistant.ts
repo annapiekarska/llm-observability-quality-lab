@@ -6,6 +6,7 @@ export type CustomerSupportRequest = {
   promptName: string;
   promptVersion: number;
   traceId: string;
+  compiledPrompt: string;
 };
 export type CustomerSupportResponse = {
   answer: string;
@@ -23,6 +24,7 @@ export const runCustomerSupportAssistant = (
     sourceContext: request.sourceContext,
     promptName: request.promptName,
     promptVersion: request.promptVersion,
+    prompt: request.compiledPrompt,
     promptLabel: "baseline",
     modelName: "mock-model",
     modelOutput: answer,

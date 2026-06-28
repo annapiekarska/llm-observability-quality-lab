@@ -15,6 +15,7 @@ export type LLMExecution = {
   latencyMs: number;
   timestamp: string;
   errorMessage?: string;
+  prompt: string;
 };
 export type ExecutionConfig = {
   environment: Environment;
