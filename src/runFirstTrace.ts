@@ -4,6 +4,7 @@ import { runCustomerSupportAssistant } from "./application/customerSupportAssist
 import { sdk } from "./observability/instrumentation.js";
 import type { ExecutionConfig } from "./types/llmObservability.js";
 import type { CustomerSupportScenario } from "../test-data/customerSupportScenarios.js";
+import { getCustomerSupportPrompt } from "./prompts/promptService.js";
 
 const executionConfig: ExecutionConfig = {
   environment: "development",
@@ -26,7 +27,11 @@ async function runScenario(scenario: CustomerSupportScenario): Promise<void> {
       promptVersion: scenario.promptVersion,
       traceId,
     };
-
+    const compiledPrompt = await getCustomerSupportPrompt({
+      sourceContext: scenario.sourceContext,
+      userInput: scenario.userInput,
+      promptLabel: executionConfig.promptLabel,
+    });
     const response = await startActiveObservation(
       "run-customer-support-assistant",
       async (assistantSpan) => {
@@ -36,7 +41,11 @@ async function runScenario(scenario: CustomerSupportScenario): Promise<void> {
             const generatedResponse = runCustomerSupportAssistant(request);
 
             generation.update({
-              input: request,
+              input: {
+                prompt: compiledPrompt,
+                userInput: request.userInput,
+                sourceContext: request.sourceContext,
+              },
               output: generatedResponse,
               model: executionConfig.modelName,
               metadata: {
